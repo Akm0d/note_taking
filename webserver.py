@@ -8,6 +8,7 @@ import os
 SECURE = False
 SUPPORTED_ERROR_CODES = {428, 429, 400, 401, 403, 404, 405, 406, 408, 409, 410, 411, 412, 413, 414, 415, 416, 417, 418,
                          422, 431, 500, 501, 502, 503, 504, 505}
+root = "notes"
 
 # App variables
 app = flask.Flask(__name__)
@@ -30,40 +31,35 @@ def favicon():
 
 @app.route("/")
 def index():
-    text = "Hello"
-    return flask.render_template('index.html', title="T-Notes:index", text=text)
+    return flask.redirect('/' + root)
 
 
-def directory(subdirs=None, files=None):
+def directory(subdirs=None, files=None, pwd=None, previous=None, pages=None):
     """Render a directory page"""
-    text = "Hello"
-    return flask.render_template('index.html', title="T-Notes:index", text=text)
+    return flask.render_template('directory.html', title="T-Notes:index", subdirs=subdirs, pwd=pwd, previous=previous,
+                                 pages=pages)
 
 
 def page():
     """Render a leaf"""
     text = "Hello"
-    return flask.render_template('index.html', title="T-Notes:index", text=text)
+    return flask.render_template('page.html', title="T-Notes:index", text=text)
 
 
-def MAP(note_path):
-    text = note_path
-    # Read the contents of the file that has the same path as my url
-    return flask.render_template('index.html', title="T-Notes:index", text=text)
-
-
-def route_tree(rootDir='notes'):
+def route_tree(rootDir=root):
     """Make a page for each file in the notes tree, if it is a directory, then list out files"""
+    previous = ""
     for dirName, subdirList, fileList in os.walk(rootDir):
-        route = "/" + dirName
-        app.add_url_rule(rule=route, view_func=directory, defaults={"subdirs": subdirList, "files": fileList})
+        route = "/" + dirName + "/"
+        app.add_url_rule(rule=route, view_func=directory,defaults={"subdirs": subdirList, "files": fileList, "pwd": route, "previous": previous})
+        previous = route
         for fname in fileList:
             app.add_url_rule(rule=route, view_func=page, defaults={"subdirs": subdirList})
 
     pass
 
 
-route_tree('notes')
+route_tree(root)
 
 if __name__ == "__main__":
     # Parse command line arguments
