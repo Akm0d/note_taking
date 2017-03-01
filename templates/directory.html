@@ -20,7 +20,11 @@
             <a href={{ previous }}>[..]</a>
             <br>
             {% for sub in subdirs %}
-                <a href={{ pwd }}{{ sub }}>{{ sub }}</a>
+                <a href={{ pwd }}{{ sub }}>[{{ sub }}]</a>
+                <br>
+            {% endfor %}
+            {% for file in files %}
+                <a href={{ pwd }}{{ file }}>{{ file }}</a>
                 <br>
             {% endfor %}
         </div>

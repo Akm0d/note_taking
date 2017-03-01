@@ -34,16 +34,20 @@ def index():
     return flask.redirect('/' + root)
 
 
-def directory(subdirs=None, files=None, pwd=None, previous=None, pages=None):
+def directory(subdirs=None, files=None, pwd=None, previous=None):
     """Render a directory page"""
     return flask.render_template('directory.html', title="T-Notes:index", subdirs=subdirs, pwd=pwd, previous=previous,
-                                 pages=pages)
+                                 files=files)
 
 
-def page():
+def page(pwd=None, file_name=None):
     """Render a leaf"""
-    text = "Hello"
-    return flask.render_template('page.html', title="T-Notes:index", text=text)
+    file_path = pwd[1:] + file_name
+    text = ""
+    with open(file_path,'r') as text_file:
+        text += text_file.read()
+
+    return flask.render_template('page.html', title="T-Notes:index", previous=pwd, text=text)
 
 
 def route_tree(rootDir=root):
@@ -51,10 +55,12 @@ def route_tree(rootDir=root):
     previous = ""
     for dirName, subdirList, fileList in os.walk(rootDir):
         route = "/" + dirName + "/"
-        app.add_url_rule(rule=route, view_func=directory,defaults={"subdirs": subdirList, "files": fileList, "pwd": route, "previous": previous})
+        app.add_url_rule(rule=route, view_func=directory,
+                         defaults={"subdirs": subdirList, "files": fileList, "pwd": route, "previous": previous})
         previous = route
         for fname in fileList:
-            app.add_url_rule(rule=route, view_func=page, defaults={"subdirs": subdirList})
+            file_route = route + fname
+            app.add_url_rule(rule=file_route, view_func=page, defaults={"pwd": previous, "file_name": fname})
 
     pass
 
