@@ -36,18 +36,21 @@ def index():
 
 def directory(subdirs=None, files=None, pwd=None, previous=None):
     """Render a directory page"""
-    return flask.render_template('directory.html', title="T-Notes:index", subdirs=subdirs, pwd=pwd, previous=previous,
-                                 files=files)
+    # Every time you open a directory, update the routes
+    route_tree(root)
+    return flask.render_template('directory.html', title="T-Notes:directory", subdirs=subdirs, pwd=pwd, previous=previous,
+                                 files=files, page_name=pwd)
 
 
 def page(pwd=None, file_name=None):
     """Render a leaf"""
+    route_tree(root)
     file_path = pwd[1:] + file_name
     text = ""
     with open(file_path,'r') as text_file:
         text += text_file.read()
 
-    return flask.render_template('page.html', title="T-Notes:index", previous=pwd, text=text)
+    return flask.render_template('page.html', page_name=file_name, title="T-Notes:index", previous=pwd, text=text)
 
 
 def route_tree(rootDir=root):
