@@ -2,6 +2,7 @@
 # coding=utf-8
 import argparse
 import flask
+import re
 import os
 
 # Global variables
@@ -38,6 +39,7 @@ def directory(subdirs=None, files=None, pwd=None, previous=None):
     """Render a directory page"""
     # Every time you open a directory, update the routes
     route_tree(root)
+    previous = re.sub(r'[^/]*/$', '', pwd)
     return flask.render_template('directory.html', title="T-Notes:directory", subdirs=subdirs, pwd=pwd, previous=previous,
                                  files=files, page_name=pwd)
 
